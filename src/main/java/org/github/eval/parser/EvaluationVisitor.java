@@ -7,6 +7,7 @@ import org.github.eval.data.EvaluationValue;
 import org.github.eval.operators.ArithmeticOperators;
 import org.github.eval.operators.ComparisonOperators;
 import org.github.eval.operators.ConcatenationOperator;
+import org.github.eval.functions.FunctionIfc;
 
 /** Walks the parse tree and computes the expression's value. */
 public class EvaluationVisitor extends ExprBaseVisitor<EvaluationValue> {
@@ -102,5 +103,12 @@ public class EvaluationVisitor extends ExprBaseVisitor<EvaluationValue> {
       return visit(ctx.functionCall());
     }
     return visit(ctx.comparison()); // '(' comparison ')'
+  }
+
+  @Override
+  public EvaluationValue visitFunctionCall(ExprParser.FunctionCallContext ctx) {
+    FunctionIfc function =
+        context.getFunctionRegistry().getFunction(ctx.IDENTIFIER().getText());
+    return function.evaluate(ctx.comparison(), context);
   }
 }

@@ -5,6 +5,7 @@ import java.util.Map;
 import org.github.eval.EvaluationException;
 import org.github.eval.ExpressionConfiguration;
 import org.github.eval.data.EvaluationValue;
+import org.github.eval.functions.FunctionRegistry;
 
 /** Per-evaluation state: variables, configuration, and a bridge back to the visitor. */
 public class EvaluationContext {
@@ -12,6 +13,7 @@ public class EvaluationContext {
   private final ExpressionConfiguration configuration;
   private final Map<String, EvaluationValue> variables;
   private final EvaluationVisitor visitor;
+  private final FunctionRegistry functionRegistry = FunctionRegistry.defaultRegistry();
 
   public EvaluationContext(
       ExpressionConfiguration configuration,
@@ -37,5 +39,9 @@ public class EvaluationContext {
 
   public MathContext getMathContext() {
     return configuration.getMathContext();
+  }
+
+  public FunctionRegistry getFunctionRegistry() {
+    return functionRegistry;
   }
 }
