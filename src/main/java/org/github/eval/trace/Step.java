@@ -1,14 +1,16 @@
 package org.github.eval.trace;
 
 import java.util.Objects;
+
+import jakarta.annotation.Nonnull;
 import org.github.eval.data.EvaluationValue;
 
-/** One recorded evaluation event. Immutable. */
-public final class Step {
-
-  private final StepType type;
-  private final String description;
-  private final EvaluationValue value; // nullable, e.g. for BRANCH
+/**
+ * One recorded evaluation event. Immutable.
+ *
+ * @param value nullable, e.g. for BRANCH
+ */
+public record Step(StepType type, String description, EvaluationValue value) {
 
   public Step(StepType type, String description, EvaluationValue value) {
     this.type = Objects.requireNonNull(type, "type");
@@ -16,21 +18,16 @@ public final class Step {
     this.value = value;
   }
 
-  public StepType getType() {
-    return type;
-  }
-
-  public String getDescription() {
-    return description;
-  }
-
-  /** The value this step produced, or null when not applicable (e.g. BRANCH). */
-  public EvaluationValue getValue() {
+  /**
+   * The value this step produced, or null when not applicable (e.g. BRANCH).
+   */
+  @Override
+  public EvaluationValue value() {
     return value;
   }
 
   @Override
-  public String toString() {
+  public @Nonnull String toString() {
     return type + ": " + description;
   }
 }

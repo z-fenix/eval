@@ -5,12 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.math.BigDecimal;
 import java.util.List;
 import org.github.eval.data.EvaluationValue;
+import org.github.eval.trace.Step;
 import org.junit.jupiter.api.Test;
 
 class ExplainFunctionTest {
 
   private static List<String> descriptions(Explanation explanation) {
-    return explanation.getSteps().stream().map(s -> s.getDescription()).toList();
+    return explanation.steps().stream().map(Step::description).toList();
   }
 
   @Test
@@ -19,7 +20,7 @@ class ExplainFunctionTest {
         new Expression("IF(amount>100000, amount*0.13, amount*0.03)")
             .with("amount", 150000)
             .explain();
-    assertEquals(EvaluationValue.of(new BigDecimal("19500")), explanation.getValue());
+    assertEquals(EvaluationValue.of(new BigDecimal("19500")), explanation.value());
     assertEquals(
         List.of(
             "Resolve variable amount = 150,000",
@@ -37,7 +38,7 @@ class ExplainFunctionTest {
   void ifFalseBranchIsTracedAndTrueBranchIsNot() {
     Explanation explanation =
         new Expression("IF(1>2, 1/0, 5)").explain(); // untaken 1/0 must not be traced or evaluated
-    assertEquals(EvaluationValue.of(new BigDecimal("5")), explanation.getValue());
+    assertEquals(EvaluationValue.of(new BigDecimal("5")), explanation.value());
     assertEquals(
         List.of(
             "1 > 2 = false",
@@ -51,7 +52,7 @@ class ExplainFunctionTest {
   @Test
   void nestedIfTracesInDepthFirstOrder() {
     Explanation explanation = new Expression("IF(TRUE, IF(FALSE, 1, 2), 3)").explain();
-    assertEquals(EvaluationValue.of(new BigDecimal("2")), explanation.getValue());
+    assertEquals(EvaluationValue.of(new BigDecimal("2")), explanation.value());
     assertEquals(
         List.of(
             "Evaluate condition TRUE → true",
@@ -67,7 +68,7 @@ class ExplainFunctionTest {
   @Test
   void maxAndRoundAreTracedAsFunctionCalls() {
     Explanation explanation = new Expression("ROUND(MAX(1, 2.5), 0)").explain();
-    assertEquals(EvaluationValue.of(new BigDecimal("3")), explanation.getValue());
+    assertEquals(EvaluationValue.of(new BigDecimal("3")), explanation.value());
     assertEquals(
         List.of(
             "Call MAX(1,2.5) = 2.5",

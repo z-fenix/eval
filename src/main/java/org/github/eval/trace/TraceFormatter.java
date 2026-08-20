@@ -48,7 +48,36 @@ public final class TraceFormatter {
   }
 
   private static String normalizeOperators(String text) {
-    return text.replace("*", "×").replace("/", "÷");
+    StringBuilder result = new StringBuilder(text.length());
+    boolean inString = false;
+    for (int i = 0; i < text.length(); i++) {
+      char c = text.charAt(i);
+      if (inString) {
+        if (c == '"') {
+          result.append('"');
+          if (i + 1 < text.length() && text.charAt(i + 1) == '"') {
+            result.append('"');
+            i++; // skip the escaped quote
+          } else {
+            inString = false;
+          }
+        } else {
+          result.append(c);
+        }
+      } else {
+        if (c == '"') {
+          result.append('"');
+          inString = true;
+        } else if (c == '*') {
+          result.append('×');
+        } else if (c == '/') {
+          result.append('÷');
+        } else {
+          result.append(c);
+        }
+      }
+    }
+    return result.toString();
   }
 
   private static String formatValue(EvaluationValue value) {

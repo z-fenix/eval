@@ -18,12 +18,12 @@ class TraceTest {
   @Test
   void stepHoldsTypeDescriptionAndNullableValue() {
     Step withValue = new Step(StepType.OPERATION, "1 + 2 = 3", num("3"));
-    assertEquals(StepType.OPERATION, withValue.getType());
-    assertEquals("1 + 2 = 3", withValue.getDescription());
-    assertEquals(num("3"), withValue.getValue());
+    assertEquals(StepType.OPERATION, withValue.type());
+    assertEquals("1 + 2 = 3", withValue.description());
+    assertEquals(num("3"), withValue.value());
 
     Step branch = new Step(StepType.BRANCH, "Take branch x", null);
-    assertNull(branch.getValue());
+    assertNull(branch.value());
   }
 
   @Test
@@ -39,8 +39,8 @@ class TraceTest {
     tracer.record(new Step(StepType.VARIABLE, "a", num("1")));
     tracer.record(new Step(StepType.OPERATION, "b", num("2")));
     assertEquals(2, tracer.getSteps().size());
-    assertEquals("a", tracer.getSteps().get(0).getDescription());
-    assertEquals("b", tracer.getSteps().get(1).getDescription());
+    assertEquals("a", tracer.getSteps().get(0).description());
+    assertEquals("b", tracer.getSteps().get(1).description());
   }
 
   @Test
