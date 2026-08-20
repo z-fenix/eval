@@ -34,6 +34,13 @@ class OperatorsTest {
   }
 
   @Test
+  void nonTerminatingDivisionThrowsEvaluationExceptionNotRawArithmeticException() {
+    assertThrows(
+        EvaluationException.class,
+        () -> ArithmeticOperators.divide(num("1"), num("3"), MathContext.UNLIMITED));
+  }
+
+  @Test
   void arithmeticCoercesNumericStringsAndBooleans() {
     assertEquals(num("3"), ArithmeticOperators.add(EvaluationValue.of("1"), num("2"), MC));
     assertEquals(num("2"), ArithmeticOperators.add(EvaluationValue.of(true), num("1"), MC));

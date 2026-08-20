@@ -28,7 +28,11 @@ public final class ArithmeticOperators {
     if (right.getNumberValue().compareTo(BigDecimal.ZERO) == 0) {
       throw new EvaluationException("Division by zero");
     }
-    return EvaluationValue.of(left.getNumberValue().divide(right.getNumberValue(), mc));
+    try {
+      return EvaluationValue.of(left.getNumberValue().divide(right.getNumberValue(), mc));
+    } catch (ArithmeticException e) {
+      throw new EvaluationException("Division failed: " + e.getMessage());
+    }
   }
 
   public static EvaluationValue negate(EvaluationValue value) {

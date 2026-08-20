@@ -58,6 +58,11 @@ class RoundMaxMinTest {
   }
 
   @Test
+  void minRequiresAtLeastOneArgument() {
+    assertThrows(EvaluationException.class, () -> evaluate("MIN()"));
+  }
+
+  @Test
   void maxCoercesNumericStrings() {
     assertEquals(num("10"), evaluate("MAX(\"10\", 2)"));
   }
