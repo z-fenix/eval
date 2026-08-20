@@ -25,6 +25,9 @@ public class FunctionRegistry {
     FunctionRegistry registry = new FunctionRegistry();
     registry.register("AND", new AndFunction());
     registry.register("OR", new OrFunction());
+    registry.register("ROUND", new RoundFunction());
+    registry.register("MAX", new MaxFunction());
+    registry.register("MIN", new MinFunction());
     return registry;
   }
 }
