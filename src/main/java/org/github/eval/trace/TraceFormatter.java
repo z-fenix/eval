@@ -36,7 +36,7 @@ public final class TraceFormatter {
   }
 
   public static String result(String originalExpression, EvaluationValue result) {
-    return "Result: " + originalExpression + " = " + formatValue(result);
+    return "Result " + originalExpression + " = " + formatValue(result);
   }
 
   private static String symbol(String operator) {

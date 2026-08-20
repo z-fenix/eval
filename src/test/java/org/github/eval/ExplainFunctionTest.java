@@ -30,7 +30,7 @@ class ExplainFunctionTest {
             "Resolve variable amount = 150,000",
             "150,000 × 0.13 = 19,500",
             "Call IF(amount>100000,amount×0.13,amount×0.03) = 19,500",
-            "Result: IF(amount>100000, amount*0.13, amount*0.03) = 19,500"),
+            "Result IF(amount>100000, amount*0.13, amount*0.03) = 19,500"),
         descriptions(explanation));
   }
 
@@ -45,7 +45,7 @@ class ExplainFunctionTest {
             "Evaluate condition 1>2 → false",
             "Take branch 5",
             "Call IF(1>2,1÷0,5) = 5",
-            "Result: IF(1>2, 1/0, 5) = 5"),
+            "Result IF(1>2, 1/0, 5) = 5"),
         descriptions(explanation));
   }
 
@@ -61,7 +61,7 @@ class ExplainFunctionTest {
             "Take branch 2",
             "Call IF(FALSE,1,2) = 2",
             "Call IF(TRUE,IF(FALSE,1,2),3) = 2",
-            "Result: IF(TRUE, IF(FALSE, 1, 2), 3) = 2"),
+            "Result IF(TRUE, IF(FALSE, 1, 2), 3) = 2"),
         descriptions(explanation));
   }
 
@@ -73,7 +73,7 @@ class ExplainFunctionTest {
         List.of(
             "Call MAX(1,2.5) = 2.5",
             "Call ROUND(MAX(1,2.5),0) = 3",
-            "Result: ROUND(MAX(1, 2.5), 0) = 3"),
+            "Result ROUND(MAX(1, 2.5), 0) = 3"),
         descriptions(explanation));
   }
 }

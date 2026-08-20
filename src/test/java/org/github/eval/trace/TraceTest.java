@@ -81,7 +81,7 @@ class TraceTest {
         TraceFormatter.function("MAX(1,2)", num("2")));
     assertEquals("Call IF(amount>100000,amount×0.13,amount×0.03) = 19,500",
         TraceFormatter.function("IF(amount>100000,amount*0.13,amount*0.03)", num("19500")));
-    assertEquals("Result: 1+2*3 = 7",
+    assertEquals("Result 1+2*3 = 7",
         TraceFormatter.result("1+2*3", num("7")));
   }
 }

@@ -23,7 +23,7 @@ class ExplainArithmeticTest {
         java.util.List.of(
             "2 × 3 = 6",
             "1 + 6 = 7",
-            "Result: 1+2*3 = 7"),
+            "Result 1+2*3 = 7"),
         explanation.steps().stream().map(Step::description).toList());
   }
 
@@ -45,7 +45,7 @@ class ExplainArithmeticTest {
             "Resolve variable price = 2.5",
             "Resolve variable qty = 4",
             "2.5 × 4 = 10",
-            "Result: price * qty = 10"),
+            "Result price * qty = 10"),
         explanation.steps().stream().map(Step::description).toList());
   }
 
@@ -57,7 +57,7 @@ class ExplainArithmeticTest {
         java.util.List.of(
             "Resolve variable amount = 150,000",
             "150,000 × 0.13 = 19,500",
-            "Result: amount * 0.13 = 19,500"),
+            "Result amount * 0.13 = 19,500"),
         explanation.steps().stream().map(Step::description).toList());
   }
 
@@ -69,7 +69,7 @@ class ExplainArithmeticTest {
         java.util.List.of(
             "1 + 1 = 2",
             "2 = 2 = true",
-            "Result: 1+1 = 2 = true"),
+            "Result 1+1 = 2 = true"),
         explanation.steps().stream().map(Step::description).toList());
 
     Explanation concat = new Expression("\"a\" & 1+1").explain();
@@ -77,7 +77,7 @@ class ExplainArithmeticTest {
         java.util.List.of(
             "1 + 1 = 2",
             "a & 2 = a2",
-            "Result: \"a\" & 1+1 = a2"),
+            "Result \"a\" & 1+1 = a2"),
         concat.steps().stream().map(Step::description).toList());
   }
 
@@ -88,14 +88,14 @@ class ExplainArithmeticTest {
         java.util.List.of(
             "-5 = -5",
             "-5 + 1 = -4",
-            "Result: -5 + 1 = -4"),
+            "Result -5 + 1 = -4"),
         explanation.steps().stream().map(Step::description).toList());
   }
 
   @Test
   void formatNumbersSteps() {
     Explanation explanation = new Expression("1+2").explain();
-    assertEquals("1. 1 + 2 = 3\n2. Result: 1+2 = 3", explanation.format());
+    assertEquals("1. 1 + 2 = 3\n2. Result 1+2 = 3", explanation.format());
   }
 
   @Test

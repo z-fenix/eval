@@ -65,7 +65,7 @@ class ExpressionTest {
 
   @Test
   void concatenation() {
-    assertEquals(EvaluationValue.of("Result: 3"), evaluate("\"Result: \" & 1+2"));
+    assertEquals(EvaluationValue.of("Result 3"), evaluate("\"Result \" & 1+2"));
     assertEquals(EvaluationValue.of("12"), evaluate("1 & 2"));
   }
 
