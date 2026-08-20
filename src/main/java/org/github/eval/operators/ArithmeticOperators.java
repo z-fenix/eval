@@ -1,0 +1,42 @@
+package org.github.eval.operators;
+
+import java.math.MathContext;
+import org.github.eval.EvaluationException;
+import org.github.eval.data.EvaluationValue;
+
+/** BigDecimal arithmetic with Excel-style operand coercion. */
+public final class ArithmeticOperators {
+
+  private ArithmeticOperators() {}
+
+  public static EvaluationValue add(EvaluationValue left, EvaluationValue right, MathContext mc) {
+    return EvaluationValue.of(left.getNumberValue().add(right.getNumberValue(), mc));
+  }
+
+  public static EvaluationValue subtract(
+      EvaluationValue left, EvaluationValue right, MathContext mc) {
+    return EvaluationValue.of(left.getNumberValue().subtract(right.getNumberValue(), mc));
+  }
+
+  public static EvaluationValue multiply(
+      EvaluationValue left, EvaluationValue right, MathContext mc) {
+    return EvaluationValue.of(left.getNumberValue().multiply(right.getNumberValue(), mc));
+  }
+
+  public static EvaluationValue divide(EvaluationValue left, EvaluationValue right, MathContext mc) {
+    try {
+      return EvaluationValue.of(left.getNumberValue().divide(right.getNumberValue(), mc));
+    } catch (ArithmeticException e) {
+      throw new EvaluationException("Division by zero");
+    }
+  }
+
+  public static EvaluationValue negate(EvaluationValue value) {
+    return EvaluationValue.of(value.getNumberValue().negate());
+  }
+
+  /** Unary plus still coerces its operand to a number. */
+  public static EvaluationValue unaryPlus(EvaluationValue value) {
+    return EvaluationValue.of(value.getNumberValue());
+  }
+}
