@@ -23,6 +23,7 @@ public class FunctionRegistry {
 
   public static FunctionRegistry defaultRegistry() {
     FunctionRegistry registry = new FunctionRegistry();
+    registry.register("IF", new IfFunction());
     registry.register("AND", new AndFunction());
     registry.register("OR", new OrFunction());
     registry.register("ROUND", new RoundFunction());
