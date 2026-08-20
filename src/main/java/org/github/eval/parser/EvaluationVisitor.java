@@ -8,6 +8,11 @@ import org.github.eval.operators.ArithmeticOperators;
 import org.github.eval.operators.ComparisonOperators;
 import org.github.eval.operators.ConcatenationOperator;
 import org.github.eval.functions.FunctionIfc;
+import org.github.eval.trace.EvaluationTracer;
+import org.github.eval.trace.NoOpTracer;
+import org.github.eval.trace.Step;
+import org.github.eval.trace.StepType;
+import org.github.eval.trace.TraceFormatter;
 
 /** Walks the parse tree and computes the expression's value. */
 public class EvaluationVisitor extends ExprBaseVisitor<EvaluationValue> {
@@ -16,11 +21,24 @@ public class EvaluationVisitor extends ExprBaseVisitor<EvaluationValue> {
 
   public EvaluationVisitor(
       ExpressionConfiguration configuration, Map<String, EvaluationValue> variables) {
-    this.context = new EvaluationContext(configuration, variables, this);
+    this(configuration, variables, NoOpTracer.INSTANCE);
+  }
+
+  public EvaluationVisitor(
+      ExpressionConfiguration configuration,
+      Map<String, EvaluationValue> variables,
+      EvaluationTracer tracer) {
+    this.context = new EvaluationContext(configuration, variables, this, tracer);
   }
 
   public EvaluationContext getContext() {
     return context;
+  }
+
+  private void trace(StepType type, String description, EvaluationValue value) {
+    if (context.getTracer().isActive()) {
+      context.getTracer().record(new Step(type, description, value));
+    }
   }
 
   @Override
@@ -32,8 +50,11 @@ public class EvaluationVisitor extends ExprBaseVisitor<EvaluationValue> {
   public EvaluationValue visitComparison(ExprParser.ComparisonContext ctx) {
     EvaluationValue result = visit(ctx.concatenation(0));
     for (int i = 0; i < ctx.comparisonOperator().size(); i++) {
+      String operator = ctx.comparisonOperator(i).getText();
+      EvaluationValue left = result;
       EvaluationValue right = visit(ctx.concatenation(i + 1));
-      result = ComparisonOperators.apply(ctx.comparisonOperator(i).getText(), result, right);
+      result = ComparisonOperators.apply(operator, left, right);
+      trace(StepType.OPERATION, TraceFormatter.operation(left, operator, right, result), result);
     }
     return result;
   }
@@ -42,7 +63,10 @@ public class EvaluationVisitor extends ExprBaseVisitor<EvaluationValue> {
   public EvaluationValue visitConcatenation(ExprParser.ConcatenationContext ctx) {
     EvaluationValue result = visit(ctx.additive(0));
     for (int i = 1; i < ctx.additive().size(); i++) {
-      result = ConcatenationOperator.concat(result, visit(ctx.additive(i)));
+      EvaluationValue left = result;
+      EvaluationValue right = visit(ctx.additive(i));
+      result = ConcatenationOperator.concat(left, right);
+      trace(StepType.OPERATION, TraceFormatter.operation(left, "&", right, result), result);
     }
     return result;
   }
@@ -51,11 +75,14 @@ public class EvaluationVisitor extends ExprBaseVisitor<EvaluationValue> {
   public EvaluationValue visitAdditive(ExprParser.AdditiveContext ctx) {
     EvaluationValue result = visit(ctx.multiplicative(0));
     for (int i = 0; i < ctx.additiveOperator().size(); i++) {
+      String operator = ctx.additiveOperator(i).getText();
+      EvaluationValue left = result;
       EvaluationValue right = visit(ctx.multiplicative(i + 1));
       result =
-          ctx.additiveOperator(i).getText().equals("+")
-              ? ArithmeticOperators.add(result, right, context.getMathContext())
-              : ArithmeticOperators.subtract(result, right, context.getMathContext());
+          operator.equals("+")
+              ? ArithmeticOperators.add(left, right, context.getMathContext())
+              : ArithmeticOperators.subtract(left, right, context.getMathContext());
+      trace(StepType.OPERATION, TraceFormatter.operation(left, operator, right, result), result);
     }
     return result;
   }
@@ -64,11 +91,14 @@ public class EvaluationVisitor extends ExprBaseVisitor<EvaluationValue> {
   public EvaluationValue visitMultiplicative(ExprParser.MultiplicativeContext ctx) {
     EvaluationValue result = visit(ctx.unary(0));
     for (int i = 0; i < ctx.multiplicativeOperator().size(); i++) {
+      String operator = ctx.multiplicativeOperator(i).getText();
+      EvaluationValue left = result;
       EvaluationValue right = visit(ctx.unary(i + 1));
       result =
-          ctx.multiplicativeOperator(i).getText().equals("*")
-              ? ArithmeticOperators.multiply(result, right, context.getMathContext())
-              : ArithmeticOperators.divide(result, right, context.getMathContext());
+          operator.equals("*")
+              ? ArithmeticOperators.multiply(left, right, context.getMathContext())
+              : ArithmeticOperators.divide(left, right, context.getMathContext());
+      trace(StepType.OPERATION, TraceFormatter.operation(left, operator, right, result), result);
     }
     return result;
   }
@@ -78,10 +108,16 @@ public class EvaluationVisitor extends ExprBaseVisitor<EvaluationValue> {
     if (ctx.sign == null) {
       return visit(ctx.primary());
     }
-    EvaluationValue value = visit(ctx.unary());
-    return ctx.sign.getText().equals("-")
-        ? ArithmeticOperators.negate(value)
-        : ArithmeticOperators.unaryPlus(value);
+    EvaluationValue operand = visit(ctx.unary());
+    EvaluationValue result =
+        ctx.sign.getText().equals("-")
+            ? ArithmeticOperators.negate(operand)
+            : ArithmeticOperators.unaryPlus(operand);
+    trace(
+        StepType.OPERATION,
+        TraceFormatter.unaryOperation(ctx.sign.getText(), operand, result),
+        result);
+    return result;
   }
 
   @Override
@@ -97,7 +133,9 @@ public class EvaluationVisitor extends ExprBaseVisitor<EvaluationValue> {
       return EvaluationValue.of(ctx.booleanLiteral().getText().equalsIgnoreCase("true"));
     }
     if (ctx.variable() != null) {
-      return context.getVariable(ctx.variable().getText());
+      EvaluationValue value = context.getVariable(ctx.variable().getText());
+      trace(StepType.VARIABLE, TraceFormatter.variable(ctx.variable().getText(), value), value);
+      return value;
     }
     if (ctx.functionCall() != null) {
       return visit(ctx.functionCall());
