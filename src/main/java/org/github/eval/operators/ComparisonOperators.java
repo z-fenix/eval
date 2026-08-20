@@ -29,8 +29,10 @@ public final class ComparisonOperators {
   }
 
   private static int compare(EvaluationValue left, EvaluationValue right) {
-    if (isNumeric(left) && isNumeric(right)) {
-      return left.getNumberValue().compareTo(right.getNumberValue());
+    BigDecimal leftNumber = toNumber(left);
+    BigDecimal rightNumber = toNumber(right);
+    if (leftNumber != null && rightNumber != null) {
+      return leftNumber.compareTo(rightNumber);
     }
     if (left.getDataType() == DataType.BOOLEAN && right.getDataType() == DataType.BOOLEAN) {
       return Boolean.compare(left.getBooleanValue(), right.getBooleanValue());
@@ -38,18 +40,17 @@ public final class ComparisonOperators {
     return left.getStringValue().compareToIgnoreCase(right.getStringValue());
   }
 
-  private static boolean isNumeric(EvaluationValue value) {
+  private static BigDecimal toNumber(EvaluationValue value) {
     if (value.getDataType() == DataType.NUMBER) {
-      return true;
+      return value.getNumberValue();
     }
     if (value.getDataType() == DataType.STRING) {
       try {
-        new BigDecimal(value.getStringValue().trim());
-        return true;
+        return new BigDecimal(value.getStringValue().trim());
       } catch (NumberFormatException e) {
-        return false;
+        return null;
       }
     }
-    return false;
+    return null;
   }
 }

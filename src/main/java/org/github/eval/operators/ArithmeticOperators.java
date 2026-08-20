@@ -1,5 +1,6 @@
 package org.github.eval.operators;
 
+import java.math.BigDecimal;
 import java.math.MathContext;
 import org.github.eval.EvaluationException;
 import org.github.eval.data.EvaluationValue;
@@ -24,11 +25,10 @@ public final class ArithmeticOperators {
   }
 
   public static EvaluationValue divide(EvaluationValue left, EvaluationValue right, MathContext mc) {
-    try {
-      return EvaluationValue.of(left.getNumberValue().divide(right.getNumberValue(), mc));
-    } catch (ArithmeticException e) {
+    if (right.getNumberValue().compareTo(BigDecimal.ZERO) == 0) {
       throw new EvaluationException("Division by zero");
     }
+    return EvaluationValue.of(left.getNumberValue().divide(right.getNumberValue(), mc));
   }
 
   public static EvaluationValue negate(EvaluationValue value) {
