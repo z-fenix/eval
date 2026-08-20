@@ -147,6 +147,8 @@ public class EvaluationVisitor extends ExprBaseVisitor<EvaluationValue> {
   public EvaluationValue visitFunctionCall(ExprParser.FunctionCallContext ctx) {
     FunctionIfc function =
         context.getFunctionRegistry().getFunction(ctx.IDENTIFIER().getText());
-    return function.evaluate(ctx.comparison(), context);
+    EvaluationValue result = function.evaluate(ctx.comparison(), context);
+    trace(StepType.FUNCTION, TraceFormatter.function(ctx.getText(), result), result);
+    return result;
   }
 }
